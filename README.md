@@ -1,1 +1,1 @@
-# ColorRemapping
+Colour Remapping is based on a technique that converts the input image into a stmap that allows you to adapt the colour constants you enter through the gizmo´s knobs to the luminance of the image. In this way, the colour entered in the blackpoint and whitepoint will affect only the dark and bright areas of your image. Using the black and white position, you can adjust the area where the colour will be represented, bringing both values closer to 0 will affect more the mid-tones of the image, giving more dominance to one colour or the other.
