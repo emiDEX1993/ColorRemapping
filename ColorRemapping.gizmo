@@ -1,0 +1,162 @@
+Group {
+ name ColorRemapping
+ help "color remapping allows you to quickly change the dominant colour according to the luminance of your image. \n\nThe position of whites, blacks, and mid-tones, shifts on the x-axis the colour constant you have chosen in the internal stmap of this gizmo. Restrict it to the highlights or shadows of your image, or give more predominance to the midtones. "
+ onCreate "\n    \n"
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\ncm= nuke.toNode(\"Constant_midtones\")\ntm= nuke.toNode(\"Transform1\")\n\n\nif k.name() == \"activate_midtones\":\n    if n.knob(\"activate_midtones\").value()==False:\n        n.knob(\"midtones\").setVisible(False)\n        cm\[\"disable\"].setValue(True)\n        tm\[\"disable\"].setValue(True)\n        n.knob(\"position_midtones\").setVisible(False)\n    else:\n        n.knob(\"midtones\").setVisible(True)\n        n.knob(\"position_midtones\").setVisible(True)\n        cm\[\"disable\"].setValue(False)\n        tm\[\"disable\"].setValue(False)\n        \n        \n\n\n"
+ tile_color 0x749dbbff
+ selected true
+ xpos 794
+ ypos 166
+ addUserKnob {20 ColorRemapping}
+ addUserKnob {41 channels T STMap1.channels}
+ addUserKnob {41 format T Constant_white.format}
+ addUserKnob {26 ""}
+ addUserKnob {41 blackpoint t "pick the colour for the darker areas of your image" T Constant_black.color}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {78 blacks_position l "blacks position" t "adjusts the position of the blackpoint to define its area of influence. \nThe closer to 0 the more it affects the mid-tones of your image.\nthe further away from 0 (with negative values) the more restricted to the dark areas of the image." n 1}
+ blacks_position -1000
+ addUserKnob {41 whitepoint t "pick the colour for the brighter areas of your image" T Constant_white.color}
+ addUserKnob {78 whites_position l "whites position" t "adjusts the position of the whitepoint to define its area of influence. \nThe closer to 0 the more it affects the mid-tones of your image.\nthe further away from 0 (with positive values) the more restricted to the brighter areas of the image." n 1}
+ whites_position 1000
+ addUserKnob {6 activate_midtones l "activate midtones" t "this knob allows you to have a third colour that affects the mid-tones of your image" +STARTLINE}
+ addUserKnob {19 midtones t "pick the colour for the mid-tones areas of your image" +HIDDEN}
+ midtones 0.5
+ addUserKnob {6 midtones_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {78 position_midtones l "midtones position" t "adjusts the position of the mid-tones to define its area of influence." +HIDDEN n 1}
+ addUserKnob {6 color_rgba_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {41 smoothness t "smoothes the transition between blackpoint and whitepoint" T Blur5.size}
+ addUserKnob {26 ""}
+ addUserKnob {41 clamp_minimum l "clamp minimum" t "to work properly, in general, you need to clamp the image by 1. but sometimes you may need to lower the maximum clamp value, to avoid artifacts" T Clamp1.minimum}
+ addUserKnob {41 clamp_maximum l "clamp maximum" t "to work properly, in general, you need to clamp the image by 1. but sometimes you may need to lower the maximum clamp value, to avoid artifacts" T Clamp1.maximum}
+ addUserKnob {26 ""}
+ addUserKnob {26 "" l mask T ""}
+ addUserKnob {41 maskChannelInput l "" -STARTLINE T Merge1.maskChannelInput}
+ addUserKnob {41 inject -STARTLINE T Merge1.inject}
+ addUserKnob {41 invert_mask l invert -STARTLINE T Merge1.invert_mask}
+ addUserKnob {41 fringe -STARTLINE T Merge1.fringe}
+ addUserKnob {41 mix T Merge1.mix}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 info l "" +STARTLINE T "<span style=\"color:#666\"><br/><b>Emilio Sarabia Valverde - ColorRemapping v1.0 \n</span>"}
+}
+ Input {
+  inputs 0
+  name mask
+  xpos 934
+  ypos 499
+  number 1
+ }
+ Input {
+  inputs 0
+  name img
+  xpos 573
+  ypos 191
+ }
+ Clamp {
+  name Clamp1
+  xpos 573
+  ypos 273
+ }
+ Dot {
+  name Dot1
+  xpos 607
+  ypos 329
+ }
+set N3786ec00 [stack 0]
+ Constant {
+  inputs 0
+  channels rgb
+  color {{parent.midtones}}
+  format {{{parent.Constant_white.format}}}
+  name Constant_midtones
+  xpos 406
+  ypos 311
+  disable true
+ }
+ Transform {
+  translate {{parent.position_midtones} -600}
+  scale 0.5
+  center {1024 540}
+  name Transform1
+  selected true
+  xpos 406
+  ypos 409
+  disable true
+ }
+push 0
+ Constant {
+  inputs 0
+  channels rgb
+  color 1
+  name Constant_white
+  xpos 100
+  ypos 345
+ }
+ Transform {
+  translate {{parent.whites_position} -250}
+  center {1024 778}
+  name Transform4
+  xpos 100
+  ypos 469
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  format {{{parent.Constant_white.format}}}
+  name Constant_black
+  xpos 251
+  ypos 300
+ }
+ Transform {
+  translate {{parent.blacks_position} -250}
+  center {1024 778}
+  name Transform3
+  onCreate "n = nuke.thisNode()\n\nn_translate = n.knob(\"translate\")\n\n\nprint(n_translate.getValue())\n"
+  knobChanged "n = nuke.thisNode()\n\nn_translate = n.knob(\"translate\")\nn_y_value = n_translate.y()\n\nn_y_value.setValue(-1000,0)\n\n"
+  xpos 251
+  ypos 413
+ }
+ Merge2 {
+  inputs 3+1
+  name Merge62
+  xpos 251
+  ypos 469
+ }
+ Blur {
+  size 500
+  name Blur5
+  xpos 251
+  ypos 493
+ }
+ Crop {
+  box {0 0 2048 1080}
+  name Crop1
+  xpos 437
+  ypos 499
+ }
+ STMap {
+  inputs 2
+  uv {rgba.red -rgba.green}
+  name STMap1
+  xpos 573
+  ypos 493
+ }
+push $N3786ec00
+ Dot {
+  name Dot2
+  xpos 785
+  ypos 329
+ }
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels rgb
+  name Merge1
+  xpos 751
+  ypos 499
+ }
+ Output {
+  name Output1
+  xpos 751
+  ypos 613
+ }
+end_group
